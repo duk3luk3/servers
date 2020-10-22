@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+
+  helloworld:
+    image: dockercloud/hello-world
+    ports:
+      - "127.0.0.1:8091:80"
+
+  bitlbee:
+    build: ../docker-bitlbee
+    image: 127.0.0.1:5000/docker-bitlbee:${BITLBEE_VERSION:-latest}
+    container_name: bitlbee
+    restart: always
+    ports:
+      - "127.0.0.1:16667:6667"
+    configs:
+      - source: bitlbee_config
+        target: /usr/local/etc/bitlbee/bitlbee.conf
+        mode: 0444
+    volumes:
+      - bitlbee_data:/var/lib/bitlbee
+        #    networks:
+        #      - hostnet
+        #
+  etherpad:
+    image: etherpad/etherpad
+
+configs:
+  bitlbee_config:
+    file:
+      ../docker-bitlbee/etc/bitlbee/bitlbee.conf
+
+volumes:
+  bitlbee_data:
+
+networks:
+  hostnet:
+    name: internal_host_net
+    internal: false
